@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RinSarthi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="custom-dot"></div>
+
+    <h1 data-key="title">RinSarthi 🤝₹</h1>
+    <p data-key="subtitle">Smart Loan Approval System for Everyone</p>
+
+    <h3 data-key="select_lang">Select Language:</h3>
+
+    <form action="/dashboard" id="lang-form">
+        <select name="language" id="custom-lang" onchange="translatePage(this.value)">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="bn">বাংলা</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ml">മലയാളം</option>
+            <option value="or">ଓଡ଼ିଆ</option>
+        </select>
+
+        <br><br>
+
+        <button type="submit" data-key="btn_continue">Continue</button>
+    </form>
+
+    <script>
+        let translations = {};
+
+        // 1. Load JSON file from static folder
+        fetch("{{ url_for('static', filename='translations.json') }}")
+            .then(response => response.json())
+            .then(data => {
+                translations = data;
+                
+                // Page load par check karo pehle se koi language save hai ya nahi
+                const savedLang = localStorage.getItem('selectedLang') || 'en';
+                document.getElementById('custom-lang').value = savedLang;
+                applyTranslation(savedLang);
+            })
+            .catch(error => console.error("Error loading translations:", error));
+
+        // 2. Dropdown change karne par ye chalega
+        function translatePage(langCode) {
+            localStorage.setItem('selectedLang', langCode); // Save for next page
+            applyTranslation(langCode);
+        }
+
+        // 3. Text replace karne ka logic
+        function applyTranslation(langCode) {
+            if (!translations[langCode]) return; // Agar data nahi hai toh ruko
+
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (translations[langCode][key]) {
+                    elem.innerText = translations[langCode][key];
+                }
+            });
+        }
+    </script>
+
+    <script>
+    document.addEventListener('mousemove', function(e) {
+        // 1. Move the permanent dot
+        const dot = document.getElementById('custom-dot');
+        if (dot) {
+            dot.style.left = e.pageX + 'px';
+            dot.style.top = e.pageY + 'px';
+        }
+
+        // 2. Spawn the trailing effect behind it
+        const trail = document.createElement('div');
+        trail.className = 'mouse-trail';
+        trail.style.left = e.pageX + 'px';
+        trail.style.top = e.pageY + 'px';
+        document.body.appendChild(trail);
+
+        // Keep the DOM clean by removing trail bits after animation
+        setTimeout(() => { 
+            trail.remove(); 
+        }, 1000);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Decision - RinSarthi</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* Hide default mouse pointer everywhere */
+        * { cursor: none !important; }
+
+        /* Base Glassy Card */
+        .result-card {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 500px;
+            width: 90%;
+            margin: 15vh auto;
+            text-align: center;
+            position: relative;
+            z-index: 10; 
+            transition: all 0.5s ease;
+            
+            /* ADDED: Bulletproof centering to fix any remaining alignment issues */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- APPROVED EFFECTS --- */
+        .approved-card {
+            background: rgba(40, 167, 69, 0.15); 
+            border: 1px solid rgba(40, 167, 69, 0.4);
+            animation: fadeInUp 0.8s ease-out, glowGreen 2.5s infinite alternate;
+        }
+
+        @keyframes glowGreen {
+            0% { box-shadow: 0 10px 30px rgba(40, 167, 69, 0.1); }
+            100% { box-shadow: 0 15px 40px rgba(40, 167, 69, 0.4); transform: scale(1.01); }
+        }
+
+        .approved-title {
+            color: #1a5e30; 
+            animation: floating 4s ease-in-out infinite; 
+        }
+
+        /* --- REJECTED EFFECTS --- */
+        .rejected-card {
+            background: rgba(230, 57, 70, 0.12);
+            border: 1px solid rgba(230, 57, 70, 0.3);
+            animation: subtleShake 0.6s ease-in-out, glowRed 2s infinite alternate;
+        }
+
+        @keyframes subtleShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes glowRed {
+            0% { box-shadow: 0 10px 30px rgba(230, 57, 70, 0.1); }
+            100% { box-shadow: 0 15px 40px rgba(230, 57, 70, 0.4); }
+        }
+
+        .rejected-title {
+            color: #bd1f2b; 
+            animation: none; 
+        }
+
+        /* Shared Text Styles */
+        .result-title {
+            font-size: 3.5rem;
+            margin: 0 0 15px 0;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5); 
+        }
+
+        .result-subtitle {
+            color: #444; 
+            font-size: 1.15rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Custom Back Button */
+        .back-btn {
+            background-color: #1084a4; 
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(16, 132, 164, 0.2);
+            width: auto; 
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 25px rgba(16, 132, 164, 0.4);
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="custom-dot"></div>
+
+    <div class="result-card {% if 'Approved' in prediction_text %}approved-card{% else %}rejected-card{% endif %}">
+        
+        <h1 class="result-title {% if 'Approved' in prediction_text %}approved-title{% else %}rejected-title{% endif %}" data-key="{% if 'Approved' in prediction_text %}res_approved_title{% else %}res_rejected_title{% endif %}">{{ prediction_text }}</h1>
+        
+        <p class="result-subtitle" data-key="{% if 'Approved' in prediction_text %}res_approved_desc{% else %}res_rejected_desc{% endif %}">{% if 'Approved' in prediction_text %}Congratulations! Our AI model has successfully processed and approved your application. Your loan journey begins here.{% else %}Unfortunately, based on our AI analysis, we cannot approve this application right now. Please check your dashboard for tips on improving your eligibility.{% endif %}</p>
+        
+        <a href="/dashboard" style="text-decoration: none;">
+            <button class="back-btn" data-key="res_btn_back">Return to Dashboard</button>
+        </a>
+    </div>
+
+    <script>
+        let translations = {};
+
+        // Fetch JSON with cache-busting timestamp
+        const jsonUrl = "{{ url_for('static', filename='translations.json') }}?t=" + new Date().getTime();
+
+        fetch(jsonUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("File not found or network error");
+                return response.json();
+            })
+            .then(data => {
+                translations = data;
+                const savedLang = localStorage.getItem('selectedLang') || 'en';
+                applyTranslation(savedLang);
+            })
+            .catch(error => console.error("Error loading JSON:", error));
+
+        function applyTranslation(langCode) {
+            if (!translations[langCode]) return;
+
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (translations[langCode][key]) {
+                    elem.innerText = translations[langCode][key];
+                }
+            });
+        }
+    </script>
+
+    <script>
+        // Confetti Logic
+        {% if 'Approved' in prediction_text %}
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            
+            var themeColors = ['#1084a4', '#28a745', '#ade2d9', '#ffffff', '#ffd700'];
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+              if (timeLeft <= 0) return clearInterval(interval);
+              var particleCount = 50 * (timeLeft / duration);
+              
+              confetti(Object.assign({}, defaults, { particleCount, colors: themeColors, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, colors: themeColors, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        {% endif %}
+
+        // Mouse Trail & Dot Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('mousemove', function(e) {
+                if (!document.body) return; 
+                
+                // FIXED: Added the logic to actually move the custom dot
+                const dot = document.getElementById('custom-dot');
+                if (dot) {
+                    dot.style.left = e.pageX + 'px';
+                    dot.style.top = e.pageY + 'px';
+                }
+
+                const trail = document.createElement('div');
+                trail.className = 'mouse-trail';
+                trail.style.left = e.pageX + 'px';
+                trail.style.top = e.pageY + 'px';
+                document.body.appendChild(trail);
+
+                setTimeout(() => {
+                    trail.remove();
+                }, 1000);
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<style>
+    /* THE INFINITE JIGSAW BOARD (4 Columns) */
+    .true-jigsaw-board {
+        display: flex;
+        flex-wrap: wrap;
+        width: 710px; /* Thoda width badhaya taaki naye gaps fit ho sakein */
+        justify-content: center;
+        max-width: 100%;
+        margin: 40px auto;
+        filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15));
+    }
+
+    .puzzle-part {
+        position: relative;
+        flex: 0 0 200px; 
+        height: 200px;
+        /* YAHAN HAI MAGIC: -40px ki jagah -32px kiya hai taaki thoda gap aa jaye */
+        margin-right: -32px;  
+        margin-bottom: -32px; 
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+        filter: brightness(0.95); /* Thoda bright rakha hai base state ko */
+        z-index: 1;
+    }
+
+    /* Resets the margin for the 4th, 8th, 12th piece so the grid drops to the next line perfectly */
+    .puzzle-part:nth-child(4n) {
+        margin-right: 0;
+    }
+
+    .puzzle-part img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Pop out effect on hover */
+    .puzzle-part:hover {
+        z-index: 50; 
+        transform: scale(1.08) translateY(-5px);
+        filter: brightness(1.15) drop-shadow(0 15px 20px rgba(0,0,0,0.5));
+    }
+
+    .part-label {
+        position: absolute;
+        top: 25px; left: 25px; right: 25px; bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(10, 76, 114, 0.85); /* Theme color */
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        border-radius: 8px;
+    }
+
+    .puzzle-part:hover .part-label { opacity: 1; }
+
+    /* The 8 Infinite Shapes */
+    .r1-c1 { clip-path: url(#r1-c1); } .r1-c2 { clip-path: url(#r1-c2); } 
+    .r1-c3 { clip-path: url(#r1-c3); } .r1-c4 { clip-path: url(#r1-c4); }
+    .mid-c1 { clip-path: url(#mid-c1); } .mid-c2 { clip-path: url(#mid-c2); } 
+    .mid-c3 { clip-path: url(#mid-c3); } .mid-c4 { clip-path: url(#mid-c4); }
+
+    .missing-piece {
+        flex: 0 0 200px; 
+        height: 200px;
+        display: flex;
+        align-items: center; justify-content: center;
+        color: #999; font-style: italic; font-weight: bold;
+        padding-left: 20px;
+    }
+</style>
+
+<svg style="width: 0; height: 0; position: absolute;" aria-hidden="true">
+    <defs>
+        <clipPath id="r1-c1" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 1 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 1 0.4 0.9 L 0.1 0.9 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="r1-c2" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 0 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 0 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 0 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="r1-c3" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 1 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 1 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 1 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="r1-c4" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.9 0.1 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 0 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 0 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+
+        <clipPath id="mid-c1" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.4 0.1 A 0.1 0.1 0 1 0 0.6 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 1 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 1 0.4 0.9 L 0.1 0.9 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="mid-c2" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.4 0.1 A 0.1 0.1 0 1 1 0.6 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 0 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 0 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 0 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="mid-c3" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.4 0.1 A 0.1 0.1 0 1 0 0.6 0.1 L 0.9 0.1 L 0.9 0.4 A 0.1 0.1 0 1 1 0.9 0.6 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 1 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 1 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+        <clipPath id="mid-c4" clipPathUnits="objectBoundingBox"><path d="M 0.1 0.1 L 0.4 0.1 A 0.1 0.1 0 1 1 0.6 0.1 L 0.9 0.1 L 0.9 0.9 L 0.6 0.9 A 0.1 0.1 0 1 0 0.4 0.9 L 0.1 0.9 L 0.1 0.6 A 0.1 0.1 0 1 0 0.1 0.4 L 0.1 0.1 Z"></path></clipPath>
+    </defs>
+</svg>
+
+<div class="true-jigsaw-board">
+    
+<div class="puzzle-part r1-c1">
+        <img src="{{ url_for('static', filename='images/1.jpeg') }}" alt="Gujarat">
+        <div class="part-label">Gujarat</div>
+    </div>
+    <div class="puzzle-part r1-c2">
+        <img src="{{ url_for('static', filename='images/2.jpeg') }}" alt="West Bengal">
+        <div class="part-label">West Bengal</div>
+    </div>
+    <div class="puzzle-part r1-c3">
+        <img src="{{ url_for('static', filename='images/3.jpeg') }}" alt="Punjab">
+        <div class="part-label">Punjab</div>
+    </div>
+    <div class="puzzle-part r1-c4">
+        <img src="{{ url_for('static', filename='images/4.jpeg') }}" alt="Assam">
+        <div class="part-label">Assam</div>
+    </div>
+
+    <div class="puzzle-part mid-c1">
+        <img src="{{ url_for('static', filename='images/5.jpeg') }}" alt="Tamil Nadu">
+        <div class="part-label">Tamil Nadu</div>
+    </div>
+    <div class="puzzle-part mid-c2">
+        <img src="{{ url_for('static', filename='images/6.jpeg') }}" alt="Maharashtra">
+        <div class="part-label">Maharashtra</div>
+    </div>
+    <div class="puzzle-part mid-c3">
+        <img src="{{ url_for('static', filename='images/7.jpeg') }}" alt="Varanasi">
+        <div class="part-label">Uttar Pradesh</div>
+    </div>
+    <div class="puzzle-part mid-c4">
+        <img src="{{ url_for('static', filename='images/9.jpeg') }}" alt="Manipur">
+        <div class="part-label">Manipur</div>
+    </div>
+
+    <div class="puzzle-part mid-c1">
+        <img src="{{ url_for('static', filename='images/10.jpeg') }}" alt="Odisha">
+        <div class="part-label">Odisha</div>
+    </div>
+    <div class="puzzle-part mid-c2">
+        <img src="{{ url_for('static', filename='images/11.jpeg') }}" alt="Bihar">
+        <div class="part-label">Bihar</div>
+    </div>
+    <div class="puzzle-part mid-c3">
+        <img src="{{ url_for('static', filename='images/12.jpeg') }}" alt="Karnataka">
+        <div class="part-label">Karnataka</div>
+    </div>
+    <div class="puzzle-part mid-c4">
+        <img src="{{ url_for('static', filename='images/8.jpeg') }}" alt="Rajasthan">
+        <div class="part-label">Rajasthan</div>
+    </div>
+
+</div>

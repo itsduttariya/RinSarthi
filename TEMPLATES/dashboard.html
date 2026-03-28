@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - RinSarthi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* 1) Hide default mouse pointer */
+        * {
+            cursor: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="custom-dot"></div>
+
+    <h2 data-key="dash_welcome">Welcome to RinSarthi 🌾✨</h2>
+
+    <div class="search-container">
+        <input type="text" data-key="search_placeholder" placeholder="Search loan types...">
+        <button type="button">🔍</button>
+    </div>
+
+
+    <h3 style="text-align: center;" data-key="explore_culture">Explore by Culture 🇮🇳</h3>
+    
+    {% include 'puzzle.html' %}
+
+
+    <h3 style="text-align: center;" data-key="check_elig">Check Your Loan Eligibility 📝</h3>
+
+    <div class="main-action-container">
+        <p style="text-align: center; color: #666; margin-bottom: 20px;" data-key="smart_form_text">
+            Fill out our smart form to see if you qualify for a loan.
+        </p>
+        <form action="/form" style="text-align: center;">
+            <button type="submit" class="hero-button" data-key="btn_start">Start Application</button>
+        </form>
+    </div>
+
+    <script>
+        let translations = {};
+
+        // JSON file fetch karega static folder se
+        fetch("{{ url_for('static', filename='translations.json') }}")
+            .then(response => response.json())
+            .then(data => {
+                translations = data;
+                
+                // localStorage se pehle save ki hui bhasha uthao (ya default English rakho)
+                const savedLang = localStorage.getItem('selectedLang') || 'en';
+                
+                // Page ko usi language me badal do
+                applyTranslation(savedLang);
+            })
+            .catch(error => console.error("Error loading translations:", error));
+
+        function applyTranslation(langCode) {
+            if (!translations[langCode]) return;
+
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (translations[langCode][key]) {
+                    // Agar ye input tag hai toh placeholder badlo
+                    if (elem.tagName === 'INPUT' && elem.hasAttribute('placeholder')) {
+                        elem.setAttribute('placeholder', translations[langCode][key]);
+                    } else {
+                        // Varna normal text badlo
+                        elem.innerText = translations[langCode][key];
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+    document.addEventListener('mousemove', function(e) {
+        // 1. Move the permanent dot
+        const dot = document.getElementById('custom-dot');
+        if (dot) {
+            dot.style.left = e.pageX + 'px';
+            dot.style.top = e.pageY + 'px';
+        }
+
+        // 2. Spawn the trailing effect behind it
+        const trail = document.createElement('div');
+        trail.className = 'mouse-trail';
+        trail.style.left = e.pageX + 'px';
+        trail.style.top = e.pageY + 'px';
+        document.body.appendChild(trail);
+
+        // Keep the DOM clean by removing trail bits after animation
+        setTimeout(() => { 
+            trail.remove(); 
+        }, 1000);
+    });
+</script>
+
+</body>
+</html>

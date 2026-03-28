@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Form - RinSarthi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Hide default mouse pointer everywhere */
+        * { cursor: none !important; }
+    </style>
+</head>
+<body class="form-page">
+
+    <div id="custom-dot"></div>
+
+    <h2 data-key="form_title">Loan Application Form 📝</h2>
+
+    <form action="/predict" method="post" class="split-form">
+        <div class="form-column">
+            <h3 data-key="form_sec_personal">Personal Details</h3>
+            
+            <label data-key="lbl_gender">Gender:</label>
+            <select name="Gender">
+                <option value="1" data-key="opt_male">Male</option>
+                <option value="0" data-key="opt_female">Female</option>
+            </select>
+
+            <label data-key="lbl_married">Married:</label>
+            <select name="Married">
+                <option value="1" data-key="opt_yes">Yes</option>
+                <option value="0" data-key="opt_no">No</option>
+            </select>
+
+            <label data-key="lbl_dependents">Dependents:</label>
+            <select name="Dependents">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" data-key="opt_3plus">3+</option>
+            </select>
+
+            <label data-key="lbl_education">Education:</label>
+            <select name="Education">
+                <option value="0" data-key="opt_grad">Graduate</option>
+                <option value="1" data-key="opt_notgrad">Not Graduate</option>
+            </select>
+
+            <label data-key="lbl_selfemp">Self Employed:</label>
+            <select name="Self_Employed">
+                <option value="0" data-key="opt_no">No</option>
+                <option value="1" data-key="opt_yes">Yes</option>
+            </select>
+        </div>
+
+        <div class="form-column">
+            <h3 data-key="form_sec_financial">Financial & Property</h3>
+            
+            <input type="number" name="ApplicantIncome" data-key="ph_app_income" placeholder="Applicant Income" required>
+            <input type="number" name="CoapplicantIncome" data-key="ph_coapp_income" placeholder="Coapplicant Income" required>
+            <input type="number" name="LoanAmount" data-key="ph_loan_amt" placeholder="Loan Amount" required>
+            <input type="number" name="Loan_Amount_Term" data-key="ph_loan_term" placeholder="Loan Term" required>
+            <input type="number" name="Credit_History" data-key="ph_credit_hist" placeholder="Credit History (1/0)" required>
+
+            <label data-key="lbl_prop_area">Property Area:</label>
+            <select name="Property_Area">
+                <option value="2" data-key="opt_urban">Urban</option>
+                <option value="1" data-key="opt_semiurban">Semiurban</option>
+                <option value="0" data-key="opt_rural">Rural</option>
+            </select>
+
+            <button type="submit" class="submit-btn" data-key="btn_predict">Predict Now</button>
+        </div>
+    </form>
+
+    <script>
+        let translations = {};
+
+        // Fetch JSON with cache-busting timestamp
+        const jsonUrl = "{{ url_for('static', filename='translations.json') }}?t=" + new Date().getTime();
+
+        fetch(jsonUrl)
+            .then(response => {
+                if (!response.ok) throw new Error("File not found or network error");
+                return response.json();
+            })
+            .then(data => {
+                translations = data;
+                
+                // Get saved language from localStorage (defaults to English)
+                const savedLang = localStorage.getItem('selectedLang') || 'en';
+                applyTranslation(savedLang);
+            })
+            .catch(error => console.error("Error loading JSON:", error));
+
+        function applyTranslation(langCode) {
+            if (!translations[langCode]) return;
+
+            document.querySelectorAll('[data-key]').forEach(elem => {
+                const key = elem.getAttribute('data-key');
+                if (translations[langCode][key]) {
+                    
+                    // Handle input placeholders
+                    if (elem.tagName === 'INPUT' && elem.hasAttribute('placeholder')) {
+                        elem.setAttribute('placeholder', translations[langCode][key]);
+                    } else {
+                        // Handle labels, headings, buttons, options
+                        elem.innerText = translations[langCode][key];
+                    }
+                }
+            });
+        }
+    </script>
+
+    <script>
+    document.addEventListener('mousemove', function(e) {
+        // 1. Move the permanent dot
+        const dot = document.getElementById('custom-dot');
+        if (dot) {
+            dot.style.left = e.pageX + 'px';
+            dot.style.top = e.pageY + 'px';
+        }
+
+        // 2. Spawn the trailing effect behind it
+        const trail = document.createElement('div');
+        trail.className = 'mouse-trail';
+        trail.style.left = e.pageX + 'px';
+        trail.style.top = e.pageY + 'px';
+        document.body.appendChild(trail);
+
+        // Keep the DOM clean by removing trail bits after animation
+        setTimeout(() => { 
+            trail.remove(); 
+        }, 1000);
+    });
+</script>
+
+</body>
+</html>
