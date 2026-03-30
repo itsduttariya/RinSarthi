@@ -54,11 +54,20 @@
         <div class="form-column">
             <h3 data-key="form_sec_financial">Financial & Property</h3>
             
-            <input type="number" name="ApplicantIncome" data-key="ph_app_income" placeholder="Applicant Income" required>
-            <input type="number" name="CoapplicantIncome" data-key="ph_coapp_income" placeholder="Coapplicant Income" required>
-            <input type="number" name="LoanAmount" data-key="ph_loan_amt" placeholder="Loan Amount" required>
-            <input type="number" name="Loan_Amount_Term" data-key="ph_loan_term" placeholder="Loan Term" required>
-            <input type="number" name="Credit_History" data-key="ph_credit_hist" placeholder="Credit History (1/0)" required>
+            <label data-key="lbl_app_income">Applicant Income:</label>
+            <input type="number" name="ApplicantIncome" required>
+
+            <label data-key="lbl_coapp_income">Coapplicant Income:</label>
+            <input type="number" name="CoapplicantIncome" required>
+
+            <label data-key="lbl_loan_amt">Loan Amount:</label>
+            <input type="number" name="LoanAmount" required>
+
+            <label data-key="lbl_loan_term">Loan Term:</label>
+            <input type="number" name="Loan_Amount_Term" required>
+
+            <label data-key="lbl_credit_hist">Credit History (1/0):</label>
+            <input type="number" name="Credit_History" required>
 
             <label data-key="lbl_prop_area">Property Area:</label>
             <select name="Property_Area">
