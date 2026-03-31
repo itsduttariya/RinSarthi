@@ -6,6 +6,18 @@
     <style>
         /* Hide default mouse pointer everywhere */
         * { cursor: none !important; }
+
+        .centered-button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+/* Optional: Make the button a specific nice width */
+.centered-button-container button {
+    width: 300px !important;
+}
     </style>
 </head>
 <body class="form-page">
@@ -14,69 +26,80 @@
 
     <h2 data-key="form_title">Loan Application Form 📝</h2>
 
-    <form action="/predict" method="post" class="split-form">
-        <div class="form-column">
-            <h3 data-key="form_sec_personal">Personal Details</h3>
+    <form action="/predict" method="post" class="split-form" style="display: flex; flex-direction: column; align-items: center; height: auto;">
+        
+        <div class="columns-container" style="display: flex; flex-direction: row; gap: 40px; width: 100%; align-items: flex-start;">
             
-            <label data-key="lbl_gender">Gender:</label>
-            <select name="Gender">
-                <option value="1" data-key="opt_male">Male</option>
-                <option value="0" data-key="opt_female">Female</option>
-            </select>
+            <div class="form-column" style="flex: 1;">
+                <h3 data-key="form_sec_personal">Personal Details</h3>
 
-            <label data-key="lbl_married">Married:</label>
-            <select name="Married">
-                <option value="1" data-key="opt_yes">Yes</option>
-                <option value="0" data-key="opt_no">No</option>
-            </select>
+                <label data-key="lbl_name">Name:</label>
+                <input type="text" name="Name" required>
+                
+                <label data-key="lbl_gender">Gender:</label>
+                <select name="Gender">
+                    <option value="1" data-key="opt_male">Male</option>
+                    <option value="0" data-key="opt_female">Female</option>
+                </select>
 
-            <label data-key="lbl_dependents">Dependents:</label>
-            <select name="Dependents">
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" data-key="opt_3plus">3+</option>
-            </select>
+                <label data-key="lbl_married">Married:</label>
+                <select name="Married">
+                    <option value="1" data-key="opt_yes">Yes</option>
+                    <option value="0" data-key="opt_no">No</option>
+                </select>
 
-            <label data-key="lbl_education">Education:</label>
-            <select name="Education">
-                <option value="0" data-key="opt_grad">Graduate</option>
-                <option value="1" data-key="opt_notgrad">Not Graduate</option>
-            </select>
+                <label data-key="lbl_dependents">Dependents:</label>
+                <select name="Dependents">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" data-key="opt_3plus">3+</option>
+                </select>
 
-            <label data-key="lbl_selfemp">Self Employed:</label>
-            <select name="Self_Employed">
-                <option value="0" data-key="opt_no">No</option>
-                <option value="1" data-key="opt_yes">Yes</option>
-            </select>
+                <label data-key="lbl_education">Education:</label>
+                <select name="Education">
+                    <option value="0" data-key="opt_grad">Graduate</option>
+                    <option value="1" data-key="opt_notgrad">Not Graduate</option>
+                </select>
+
+                <label data-key="lbl_selfemp">Self Employed:</label>
+                <select name="Self_Employed">
+                    <option value="0" data-key="opt_no">No</option>
+                    <option value="1" data-key="opt_yes">Yes</option>
+                </select>
+            </div>
+
+            
+
+            <div class="form-column" style="flex: 1;">
+                <h3 data-key="form_sec_financial">Financial & Property</h3>
+                
+                <label data-key="lbl_app_income">Applicant Income:</label>
+                <input type="number" name="ApplicantIncome" required>
+
+                <label data-key="lbl_coapp_income">Coapplicant Income:</label>
+                <input type="number" name="CoapplicantIncome" required>
+
+                <label data-key="lbl_loan_amt">Loan Amount:</label>
+                <input type="number" name="LoanAmount" required>
+
+                <label data-key="lbl_loan_term">Loan Term:</label>
+                <input type="number" name="Loan_Amount_Term" required>
+
+                <label data-key="lbl_credit_hist">Credit History (1/0):</label>
+                <input type="number" name="Credit_History" required>
+
+                <label data-key="lbl_prop_area">Property Area:</label>
+                <select name="Property_Area">
+                    <option value="2" data-key="opt_urban">Urban</option>
+                    <option value="1" data-key="opt_semiurban">Semiurban</option>
+                    <option value="0" data-key="opt_rural">Rural</option>
+                </select>
+            </div>
         </div>
 
-        <div class="form-column">
-            <h3 data-key="form_sec_financial">Financial & Property</h3>
-            
-            <label data-key="lbl_app_income">Applicant Income:</label>
-            <input type="number" name="ApplicantIncome" required>
-
-            <label data-key="lbl_coapp_income">Coapplicant Income:</label>
-            <input type="number" name="CoapplicantIncome" required>
-
-            <label data-key="lbl_loan_amt">Loan Amount:</label>
-            <input type="number" name="LoanAmount" required>
-
-            <label data-key="lbl_loan_term">Loan Term:</label>
-            <input type="number" name="Loan_Amount_Term" required>
-
-            <label data-key="lbl_credit_hist">Credit History (1/0):</label>
-            <input type="number" name="Credit_History" required>
-
-            <label data-key="lbl_prop_area">Property Area:</label>
-            <select name="Property_Area">
-                <option value="2" data-key="opt_urban">Urban</option>
-                <option value="1" data-key="opt_semiurban">Semiurban</option>
-                <option value="0" data-key="opt_rural">Rural</option>
-            </select>
-
-            <button type="submit" class="submit-btn" data-key="btn_predict">Predict Now</button>
+        <div class="centered-button-container" style="margin-top: 30px; width: 100%; display: flex; justify-content: center;">
+             <button type="submit" class="submit-btn" data-key="btn_predict" style="width: 300px;">Predict Now</button>
         </div>
     </form>
 
